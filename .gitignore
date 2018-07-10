@@ -1,0 +1,4 @@
+*.jpeg
+simulatedData/
+*.DS_Store
+*.Rhistory
