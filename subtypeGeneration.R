@@ -37,17 +37,36 @@ for (ptt in pttnum) {
         sbt_pwy[,i] = col
       }
       
-      # terminate if some subtypes have the same pathway combination;
-      # otherwise, simulate it again
-      for (i in 1:(sbt-1)){
-        for (j in (i+1):sbt){
-          if (identical(sbt_pwy[i,], sbt_pwy[j,])){
-            isinteresting = TRUE
-            break
-          }
+      # count repeat times for each pathway combination
+      index = matrix(0L, ncol = 2 ^ pwy, nrow = 2)
+      for (i in 1:sbt){
+        sum = 0
+        cntone = 0
+        for (j in 1:pwy){
+          sum = sum*2 + sbt_pwy[i,j]
+          if (sbt_pwy[i,j] == 1)
+            cntone = cntone + 1
         }
-        if (isinteresting)
+        index[1,sum+1] = cntone
+        index[2,sum+1] = index[2,sum+1] + 1
+      }
+      
+      # each subtype has at least one pathway
+      if (index[2,1] != 0){
+        next
+      }
+      # terminate if all subtypes meet Cayley's formula constraints,
+      # and some subtypes have the same pathway combination;
+      # otherwise, simulate it again
+      for (i in 1:dim(index)[2]){
+        cayley = (index[1,i] + 1) ^ (index[1,i] - 1)
+        if (index[2,i] > cayley){
+          isinteresting = FALSE
           break
+        }
+        if (index[2,i] >= 2){
+          isinteresting = TRUE
+        }
       }
     }
 
